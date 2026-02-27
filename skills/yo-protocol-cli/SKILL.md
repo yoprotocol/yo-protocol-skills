@@ -230,19 +230,8 @@ yo prepare redeem --vault yoUSD --shares 100 --recipient 0xSafeAddress
 
 Returns `{ to, data, value }`.
 
-#### `yo prepare deposit-with-approval --vault <id|addr> --token <addr> --owner <addr> --amount <n> [--recipient <addr>] [--slippage-bps <n>]`
-Build approve + deposit transactions. Checks on-chain allowance — returns 1 tx if already approved, 2 if not.
-
-```bash
-yo prepare deposit-with-approval \
-  --vault yoUSD \
-  --token 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48 \
-  --owner 0xSafeAddress \
-  --amount 1000 \
-  --recipient 0xSafeAddress
-```
-
-Returns array of `{ to, data, value }` — `[approveTx?, depositTx]`.
+#### ~~`yo prepare deposit-with-approval`~~ — DEPRECATED, DO NOT USE
+This command is unreliable. **Always use separate `yo prepare approve` + `yo prepare deposit` instead.** When executing the transactions, wait for the approve tx to confirm on-chain before submitting the deposit tx.
 
 ---
 
@@ -317,6 +306,8 @@ Returns complete schema with all commands, options, arguments, vault configs, ch
 
 ### Check vault state and deposit (Safe/AA)
 
+**Always use separate approve + deposit. Wait for approve tx confirmation before depositing.**
+
 ```bash
 # 1. Check vault state
 yo read vault-state --vault yoUSD --rpc-url $YO_RPC_URL
@@ -326,15 +317,21 @@ yo read allowance \
   --token 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48 \
   --owner 0xSafeAddress
 
-# 3. Build approve + deposit calldata
-yo prepare deposit-with-approval \
-  --vault yoUSD \
+# 3. Build approve calldata (if allowance is insufficient)
+yo prepare approve \
   --token 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48 \
-  --owner 0xSafeAddress \
+  --amount 1000 \
+  --decimals 6
+
+# 4. Submit approve tx → WAIT FOR CONFIRMATION before next step!
+
+# 5. Build deposit calldata
+yo prepare deposit \
+  --vault yoUSD \
   --amount 1000 \
   --recipient 0xSafeAddress
 
-# 4. Submit the returned tx(s) to your Safe/AA wallet
+# 6. Submit deposit tx
 ```
 
 ### Query user position across chains
@@ -382,7 +379,7 @@ yo read preview-redeem --vault yoUSD --shares 100000000 --raw
 2. **`--chain` defaults to 1 (Ethereum)** — Always specify `--chain 8453` for Base or `--chain 42161` for Arbitrum.
 3. **RPC required for `read` and `prepare`** — Set `YO_RPC_URL` env var or pass `--rpc-url` per command. `info` and `api` commands don't need RPC.
 4. **Vault IDs are case-sensitive** — Use `yoETH`, not `yoeth` or `YOETH`.
-5. **`prepare deposit-with-approval` returns an array** — May contain 1 tx (already approved) or 2 txs (approve + deposit).
+5. **Always use separate `prepare approve` + `prepare deposit`** — Do NOT use `deposit-with-approval`. Wait for the approve tx to confirm on-chain before submitting the deposit tx.
 6. **Default slippage is 50 bps (0.5%)** — Override with `--slippage-bps`.
 7. **Gateway is the spender** — Approvals should target the Gateway (`0xF1EeE0957267b1A474323Ff9CfF7719E964969FA`), not the vault.
 8. **Cross-chain token addresses differ** — USDC on Ethereum vs Base vs Arbitrum are different contracts. Use `yo info resolve` to look up vault details.
