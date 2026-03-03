@@ -8,8 +8,7 @@ type VaultId = 'yoETH' | 'yoBTC' | 'yoUSD' | 'yoEUR' | 'yoGOLD' | 'yoUSDT'
 
 interface YoClientConfig {
   chainId: SupportedChainId
-  publicClient?: PublicClient
-  walletClient?: WalletClient
+  publicClients?: Partial<Record<SupportedChainId, PublicClient>>
   partnerId?: number           // default: 9999
 }
 ```
@@ -33,6 +32,7 @@ interface VaultConfig {
   address: Address
   name: string
   symbol: VaultId
+  network: NetworkName
   underlying: {
     symbol: string
     decimals: number
@@ -64,21 +64,13 @@ interface TokenAllowance {
 }
 ```
 
-## Action Results
+## Transaction Types
 
 ```ts
-interface DepositResult {
-  hash: Hash
-  shares: bigint
-}
-
-interface RedeemResult {
-  hash: Hash
-  assets: bigint
-}
-
-interface ApproveResult {
-  hash: Hash
+interface PreparedTransaction {
+  to: Address
+  data: Hex
+  value: bigint
 }
 
 interface TransactionReceipt {
@@ -96,11 +88,66 @@ interface RedeemReceipt {
   shares: bigint
   blockNumber: bigint
 }
+```
 
-interface PreparedTransaction {
-  to: Address
-  data: Hex
-  value: bigint
+## Deposit/Redeem Params
+
+```ts
+interface DepositParams {
+  vault: Address
+  amount: bigint
+  recipient?: Address
+  minShares?: bigint
+}
+
+interface DepositViaGatewayParams extends DepositParams {
+  slippageBps?: number   // default 50 (0.5%)
+  partnerId?: number
+}
+
+interface PrepareDepositWithApprovalParams extends DepositViaGatewayParams {
+  token: Address         // underlying token to deposit
+  owner: Address         // who owns the tokens
+}
+
+interface RedeemParams {
+  vault: Address
+  shares: bigint
+  recipient?: Address
+  minAssetsOut?: bigint
+  slippageBps?: number
+}
+
+interface RedeemViaGatewayParams extends RedeemParams {
+  partnerId?: number
+}
+
+interface PrepareRedeemWithApprovalParams extends RedeemViaGatewayParams {
+  owner: Address         // who owns the shares
+}
+
+interface PrepareApproveParams {
+  token: Address
+  spender?: Address      // defaults to YO_GATEWAY_ADDRESS
+  amount: bigint
+}
+```
+
+## Legacy Result Types (for wallet-based standalone functions)
+
+```ts
+interface DepositResult {
+  hash: Hash
+  shares: bigint
+}
+
+interface RedeemResult {
+  hash: Hash
+  assets: bigint
+}
+
+interface ApproveResult {
+  hash: Hash
 }
 ```
 
@@ -160,6 +207,7 @@ interface PendingRedeem {
 }
 
 type Network = 'base' | 'ethereum' | 'arbitrum' | 'unichain' | 'tac' | 'plasma' | 'hyperevm'
+type NetworkName = 'ethereum' | 'base' | 'arbitrum'
 ```
 
 ## Merkl Types
@@ -196,10 +244,6 @@ interface MerklTokenReward {
 interface MerklChainRewards {
   chainId: number
   rewards: MerklTokenReward[]
-}
-
-interface ClaimMerklRewardsResult {
-  hash: Hash
 }
 
 type MerklCampaignStatus = 'LIVE' | 'PAST'
