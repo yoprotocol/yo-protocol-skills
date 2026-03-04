@@ -1,11 +1,19 @@
 ---
 name: yo-protocol-sdk
 description: >-
-  Build applications with the Yo Protocol SDK (`@yo-protocol/core`) — an ERC-4626 yield vault protocol
-  supporting Ethereum (1), Base (8453), and Arbitrum (42161). Use when writing code that interacts with
-  Yo Protocol vaults: preparing deposit/redeem transactions, checking positions, querying vault snapshots/yield/TVL,
-  or claiming Merkl rewards. Triggers on mentions of Yo Protocol, yoETH, yoUSD, yoBTC, yoEUR, yoGOLD, yoUSDT,
-  yo-protocol/core, YoClient, createYoClient, PreparedTransaction, or ERC-4626 vault interactions via the Yo gateway.
+  ALWAYS use this skill when the user writes TypeScript or JavaScript code that imports from `@yo-protocol/core`,
+  uses `createYoClient`, or programmatically interacts with Yo Protocol vaults (yoETH, yoUSD, yoBTC, yoEUR,
+  yoGOLD, yoUSDT) via the SDK. This skill covers the complete `@yo-protocol/core` SDK: client initialization
+  (createYoClient, multi-chain publicClients, partnerId), vault reads (getVaultState, previewDeposit,
+  previewRedeem, isPaused), user reads (getUserPosition, getShareBalance, getTokenBalance, getAllowance),
+  prepared transactions (prepareDepositWithApproval, prepareRedeemWithApproval, prepareApprove), REST API
+  queries (getVaultSnapshot, getVaultYieldHistory, getVaultTvlHistory, getUserHistory, getUserPerformance),
+  Merkl reward claims (getClaimableRewards, prepareClaimMerklRewards), and utilities (parseTokenAmount,
+  formatTokenAmount, VAULTS registry, gateway address). Trigger for Node.js scripts, backend services, bots,
+  Safe/AA batch transaction builders, or any non-React TypeScript code that interacts with Yo Protocol.
+  Also trigger when the user mentions the Yo gateway, PreparedTransaction, ERC-4626 vault interactions
+  specific to Yo, or asks about vault addresses and token addresses per chain. Do NOT use for React hooks
+  (use yo-protocol-react) or CLI shell commands (use yo-protocol-cli).
 author: yoprotocol
 homepage: https://github.com/yoprotocol/yo-protocol-skills
 source: https://github.com/yoprotocol/yo-protocol-skills/tree/main/skills/yo-protocol-sdk

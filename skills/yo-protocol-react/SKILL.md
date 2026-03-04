@@ -1,15 +1,17 @@
 ---
 name: yo-protocol-react-sdk
 description: >-
-  Build features and migrate code using @yo-protocol/react and @yo-protocol/core SDK. Use when
-  writing React hooks or components that interact with Yo Protocol vaults, migrating from the old
-  SDK API to the new prepare+send pattern, updating imports from renamed hooks
-  (useVault→useVaultState, useUserBalance→useUserPosition), fixing deposit/redeem params
-  (inputToken→token, account→owner), updating client creation (publicClient→publicClients,
-  partnerId string→number), or working with files that import from @yo-protocol/react or
-  @yo-protocol/core. Triggers on imports of @yo-protocol/react, @yo-protocol/core, hook names like
-  useVaultState, useDeposit, useRedeem, useUserPosition, YieldProvider, useYoClient, or mentions of
-  "yo protocol", "yo-kit", "vault hooks".
+  ALWAYS use this skill when the user is working with React components or hooks that interact with Yo
+  Protocol vaults, or imports from `@yo-protocol/react`. This skill covers the full React SDK: YieldProvider
+  setup, query hooks (useVaultState, useVaultSnapshot, useUserPosition, useTokenBalance, useShareBalance,
+  useAllowance, useMerklRewards, useLeaderboard, usePrices, etc.), action hooks (useDeposit, useRedeem,
+  useApprove, useClaimMerklRewards), and migration from the old API (useVault→useVaultState,
+  useUserBalance→useUserPosition, inputToken→token, account→owner, partnerId string→number,
+  publicClient→publicClients). Trigger whenever the user mentions yo protocol React hooks, vault dashboard
+  components, deposit/redeem UI flows, YieldProvider, useYoClient, @yo-protocol/react, yo-kit, or asks
+  to build React components for yoETH, yoUSD, yoBTC, yoEUR, yoGOLD, or yoUSDT vaults. Also trigger when
+  the user has broken imports or API changes after upgrading @yo-protocol/react. Do NOT use for CLI shell
+  commands (use yo-protocol-cli) or server-side Node.js scripts without React (use yo-protocol-sdk).
 author: yoprotocol
 homepage: https://github.com/yoprotocol/yo-protocol-skills
 source: https://github.com/yoprotocol/yo-protocol-skills/tree/main/skills/yo-protocol-react

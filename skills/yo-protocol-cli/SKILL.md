@@ -1,13 +1,16 @@
 ---
 name: yo-protocol-cli
 description: >-
-  Use the Yo Protocol CLI (`@yo-protocol/cli`) — an agent-first transaction builder for ERC-4626 yield
-  vaults on Ethereum (1), Base (8453), and Arbitrum (42161). The `yo` binary outputs structured JSON to
-  stdout, never requires or accepts private keys, and is designed for agent/bot consumption. Use when
-  scripting vault interactions, building unsigned transaction calldata for Safe/AA wallets, querying
-  on-chain vault state or balances via RPC, fetching off-chain snapshots/yield/TVL/user data from the
-  Yo API, or piping CLI output into other tools. Triggers on mentions of yo CLI, yo command, yo prepare,
-  yo read, yo api, yo info, yo schema, @yo-protocol/cli, or agent-first transaction building for Yo Protocol.
+  ALWAYS use this skill when the user mentions the Yo Protocol CLI, the `yo` command, `@yo-protocol/cli`,
+  or wants to interact with Yo Protocol vaults (yoETH, yoUSD, yoBTC, yoEUR, yoGOLD, yoUSDT) from a shell
+  script, terminal, or command line. This skill covers the `yo` binary — an agent-first transaction builder
+  that outputs JSON to stdout for ERC-4626 yield vaults on Ethereum, Base, and Arbitrum. Use it for:
+  building unsigned calldata for Safe/AA wallets (`yo prepare`), querying on-chain vault state via RPC
+  (`yo read`), fetching yield/TVL/snapshot data from the REST API (`yo api`), listing vaults and chains
+  (`yo info`), piping output into jq or other tools, setting up YO_RPC_URL, or any bash/shell automation
+  involving Yo Protocol. Also trigger when the user asks about vault exchange rates, share balances, pending
+  redemptions, or deposit previews in a scripting context. Do NOT use for React hooks (@yo-protocol/react)
+  or TypeScript SDK code (@yo-protocol/core) — those have dedicated skills.
 author: yoprotocol
 homepage: https://github.com/yoprotocol/yo-protocol-skills
 source: https://github.com/yoprotocol/yo-protocol-skills/tree/main/skills/yo-protocol-cli
