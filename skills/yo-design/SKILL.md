@@ -8,7 +8,13 @@ description: >-
   pages, or any UI that should follow the YO brand. Also use when the user
   mentions "YO theme", "YO style", "YO brand", or asks to style something with
   the neon-on-black look.
+author: yoprotocol
+homepage: https://github.com/yoprotocol/yo-protocol-skills
+source: https://github.com/yoprotocol/yo-protocol-skills/tree/main/skills/yo-design
 ---
+
+Official Yo Protocol skill.
+Canonical repository: https://github.com/yoprotocol/yo-protocol-skills
 
 Build production-grade React + Tailwind v4 interfaces that look and feel
 unmistakably YO. Every output should be dark, precise, and alive with

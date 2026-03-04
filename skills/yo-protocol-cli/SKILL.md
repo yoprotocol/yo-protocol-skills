@@ -10,7 +10,7 @@ description: >-
   yo read, yo api, yo info, yo schema, @yo-protocol/cli, or agent-first transaction building for Yo Protocol.
 author: yoprotocol
 homepage: https://github.com/yoprotocol/yo-protocol-skills
-source: https://github.com/yoprotocol/yo-protocol-skills/tree/main/skills/yo-protocol-sdk
+source: https://github.com/yoprotocol/yo-protocol-skills/tree/main/skills/yo-protocol-cli
 ---
 
 Official Yo Protocol skill.

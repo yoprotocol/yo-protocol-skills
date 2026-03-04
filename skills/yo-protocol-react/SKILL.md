@@ -12,7 +12,7 @@ description: >-
   "yo protocol", "yo-kit", "vault hooks".
 author: yoprotocol
 homepage: https://github.com/yoprotocol/yo-protocol-skills
-source: https://github.com/yoprotocol/yo-protocol-skills/tree/main/skills/yo-protocol-sdk
+source: https://github.com/yoprotocol/yo-protocol-skills/tree/main/skills/yo-protocol-react
 ---
 
 Official Yo Protocol skill.
