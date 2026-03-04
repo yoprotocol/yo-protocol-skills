@@ -13,10 +13,19 @@ Claude Code skills for [YO Protocol](https://yo.xyz).
 
 ## Installation
 
-Sync from this repo — commits here, installs skills to `~/.agents`, commits there:
+Install individual skills via [skills.sh](https://skills.sh):
 
 ```bash
-just sync
+npx skills add yoprotocol/yo-protocol-skills --skill yo-protocol-sdk
+npx skills add yoprotocol/yo-protocol-skills --skill yo-protocol-react
+npx skills add yoprotocol/yo-protocol-skills --skill yo-protocol-cli
+npx skills add yoprotocol/yo-protocol-skills --skill yo-design
+```
+
+Or install all skills at once:
+
+```bash
+npx skills add yoprotocol/yo-protocol-skills --all
 ```
 
 ## Development
