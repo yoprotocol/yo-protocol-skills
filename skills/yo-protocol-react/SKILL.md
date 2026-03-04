@@ -1,6 +1,15 @@
 ---
 name: yo-protocol-react-sdk
-description: Build features and migrate code using @yo-protocol/react and @yo-protocol/core SDK. Use when: (1) writing React hooks or components that interact with Yo Protocol vaults, (2) migrating from the old SDK API to the new prepare+send pattern, (3) updating imports from renamed hooks (useVault→useVaultState, useUserBalance→useUserPosition), (4) fixing deposit/redeem params (inputToken→token, account→owner), (5) updating client creation (publicClient→publicClients, partnerId string→number), (6) working with files that import from @yo-protocol/react or @yo-protocol/core. TRIGGER on: imports of `@yo-protocol/react`, `@yo-protocol/core`, hook names like `useVaultState`, `useDeposit`, `useRedeem`, `useUserPosition`, `YieldProvider`, `useYoClient`, or mentions of "yo protocol", "yo-kit", "vault hooks".
+description: >-
+  Build features and migrate code using @yo-protocol/react and @yo-protocol/core SDK. Use when
+  writing React hooks or components that interact with Yo Protocol vaults, migrating from the old
+  SDK API to the new prepare+send pattern, updating imports from renamed hooks
+  (useVault→useVaultState, useUserBalance→useUserPosition), fixing deposit/redeem params
+  (inputToken→token, account→owner), updating client creation (publicClient→publicClients,
+  partnerId string→number), or working with files that import from @yo-protocol/react or
+  @yo-protocol/core. Triggers on imports of @yo-protocol/react, @yo-protocol/core, hook names like
+  useVaultState, useDeposit, useRedeem, useUserPosition, YieldProvider, useYoClient, or mentions of
+  "yo protocol", "yo-kit", "vault hooks".
 author: yoprotocol
 homepage: https://github.com/yoprotocol/yo-protocol-skills
 source: https://github.com/yoprotocol/yo-protocol-skills/tree/main/skills/yo-protocol-sdk
@@ -14,9 +23,10 @@ Canonical repository: https://github.com/yoprotocol/yo-protocol-skills
 ## Architecture
 
 Three layers:
+
 1. **Provider** — `YieldProvider` wraps app, provides config. `useYoClient()` creates `YoClient` from `@yo-protocol/core`
-2. **Query hooks** (32) — Read data via `useQuery` + `client.getX()`. Return `{ data, isLoading, isError, error, refetch }`
-3. **Action hooks** (4) — Mutate via `client.prepareX()` + wagmi `sendTransactionAsync()`. Return `{ mutate, step, hash, reset }`
+1. **Query hooks** (32) — Read data via `useQuery` + `client.getX()`. Return `{ data, isLoading, isError, error, refetch }`
+1. **Action hooks** (4) — Mutate via `client.prepareX()` + wagmi `sendTransactionAsync()`. Return `{ mutate, step, hash, reset }`
 
 Core only prepares transactions (`PreparedTransaction { to, data, value }`). React sends them via wagmi. No `walletClient` needed.
 
@@ -53,23 +63,24 @@ When encountering code using the old API, consult [references/migration.md](refe
 
 ### Quick migration checklist — search and replace:
 
-| Find | Replace with |
-|------|-------------|
-| `useVault(` | `useVaultState(` |
-| `useUserBalance(` | `useUserPosition(` |
-| `useWeeklyRewards(` | `useLeaderboard("weekly",` |
-| `useAllTimeRewards(` | `useLeaderboard("allTime",` |
-| `{ vault: vaultState }` | `{ vaultState }` |
-| `{ position } = useUserBalance` | `{ position } = useUserPosition` |
-| `inputToken:` (in deposit) | `token:` |
-| `account:` (in deposit/redeem params) | `owner:` |
-| `fromChainId:` / `toChainId:` | `chainId:` |
-| `partnerId: "` | `partnerId:` (number, not string) |
-| `publicClient:` (in createYoClient) | `publicClients: { [chainId]:` |
-| `useWalletClient` import | Remove — no longer needed |
-| `walletClient` param | Remove — core only prepares txs |
+| Find                                  | Replace with                      |
+| ------------------------------------- | --------------------------------- |
+| `useVault(`                           | `useVaultState(`                  |
+| `useUserBalance(`                     | `useUserPosition(`                |
+| `useWeeklyRewards(`                   | `useLeaderboard("weekly",`        |
+| `useAllTimeRewards(`                  | `useLeaderboard("allTime",`       |
+| `{ vault: vaultState }`               | `{ vaultState }`                  |
+| `{ position } = useUserBalance`       | `{ position } = useUserPosition`  |
+| `inputToken:` (in deposit)            | `token:`                          |
+| `account:` (in deposit/redeem params) | `owner:`                          |
+| `fromChainId:` / `toChainId:`         | `chainId:`                        |
+| `partnerId: "`                        | `partnerId:` (number, not string) |
+| `publicClient:` (in createYoClient)   | `publicClients: { [chainId]:`     |
+| `useWalletClient` import              | Remove — no longer needed         |
+| `walletClient` param                  | Remove — core only prepares txs   |
 
 ### Import updates
+
 ```tsx
 // Old imports to find and remove
 import { useVault } from '*/useVault'
@@ -106,6 +117,7 @@ For complete API signatures and query keys, see [references/hooks-api.md](refere
 ## Creating New Query Hooks
 
 Follow this pattern for any new query hook:
+
 ```tsx
 import { useQuery } from '@tanstack/react-query'
 import type { VaultId } from '@yo-protocol/core'
@@ -133,6 +145,7 @@ export function useNewHook(vault: Address | VaultId, options?: { enabled?: boole
 ```
 
 Rules:
+
 - Query key prefix: `'yo-'` for protocol hooks, `'merkl-'` for Merkl hooks
 - Always include `client?.chainId` as last key segment
 - Guard with `enabled && !!client` (add `!!userAddress` for user-specific hooks)
@@ -142,6 +155,7 @@ Rules:
 ## Creating New Action Hooks
 
 Follow this pattern — prepare+send with step tracking:
+
 ```tsx
 import { useCallback, useState } from 'react'
 import { useSendTransaction, useWaitForTransactionReceipt, useAccount } from 'wagmi'

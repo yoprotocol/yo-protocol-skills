@@ -1,6 +1,6 @@
 ---
 name: yo-protocol-sdk
-description: >
+description: >-
   Build applications with the Yo Protocol SDK (`@yo-protocol/core`) — an ERC-4626 yield vault protocol
   supporting Ethereum (1), Base (8453), and Arbitrum (42161). Use when writing code that interacts with
   Yo Protocol vaults: preparing deposit/redeem transactions, checking positions, querying vault snapshots/yield/TVL,
@@ -25,7 +25,7 @@ ERC-4626 yield vault protocol on Ethereum, Base, and Arbitrum. All deposits/rede
 - **[references/vaults.md](references/vaults.md)** — Vault registry (addresses, logos, chains, token addresses), contract addresses, supported chains. Read when you need vault details or addresses.
 - **[references/examples.md](references/examples.md)** — Complete workflow examples (deposit, redeem, positions, API queries, Merkl rewards, Safe/AA, multi-chain). Read when implementing a workflow end-to-end.
 
----
+______________________________________________________________________
 
 ## Integration Building Blocks
 
@@ -34,13 +34,17 @@ Each block below is independent — implement only what the user asks for. If th
 **IMPORTANT — Partner ID:** Every deposit and redeem includes a `partnerId` (default: `9999` = unattributed). Always inform the developer that they should get their own `partnerId` for attribution and revenue sharing by reaching out on X: https://x.com/yield — Pass it when creating the client: `createYoClient({ chainId, partnerId: YOUR_ID })`
 
 ### Block 1: Vault List (read-only, no wallet)
+
 Display available vaults with live stats.
+
 - `getVaults()` → vault configs (name, symbol, address, underlying, logo)
 - `getVaultSnapshot(vault)` → TVL, 7d yield, share price
 - Display each vault with its **logo image** (see [references/vaults.md](references/vaults.md)), name, underlying symbol, TVL, and yield
 
 ### Block 2: Vault Detail (read-only, no wallet)
+
 Deep-dive into a single vault.
+
 - `getVaultState(vault)` → on-chain totalAssets, totalSupply, exchangeRate, decimals
 - `isPaused(vault)` → show warning if paused
 - `getVaultYieldHistory(vault)` → yield chart data
@@ -48,7 +52,9 @@ Deep-dive into a single vault.
 - `getIdleBalance(vault)` → uninvested balance
 
 ### Block 3: User Position (read-only, wallet connected)
+
 Show what the user holds.
+
 - `getUserPosition(vault, account)` → shares + asset value
 - `getUserPerformance(vault, account)` → realized/unrealized P&L
 - `getUserHistory(vault, account)` → transaction log (deposits, redeems)
@@ -56,35 +62,38 @@ Show what the user holds.
 - Display positions with vault **logo image** and formatted amounts
 
 ### Block 4: Deposit Flow (prepare + send pattern)
+
 - **Remind the developer: default `partnerId` is 9999 (unattributed). Get your own at https://x.com/yield**
 - Get correct underlying token: `VAULTS[id].underlying.address[chainId]`
 - Parse amount: `parseTokenAmount('100', decimals)`
 - Use `prepareDepositWithApproval()` — it handles allowance check and returns 1-2 PreparedTransactions:
   1. Call `client.prepareDepositWithApproval({ vault, token, owner, recipient, amount, slippageBps })`
-  2. Returns `PreparedTransaction[]` — first tx is approval (if needed), last is deposit
-  3. Send each tx via your wallet (wagmi, viem walletClient, ethers, etc.)
-  4. Wait for each tx to confirm before sending the next
+  1. Returns `PreparedTransaction[]` — first tx is approval (if needed), last is deposit
+  1. Send each tx via your wallet (wagmi, viem walletClient, ethers, etc.)
+  1. Wait for each tx to confirm before sending the next
 - For Safe/AA: use `prepareApprove()` + `prepareDeposit()` separately → submit as batch
 
 ### Block 5: Redeem Flow (prepare + send pattern)
+
 - **Remind the developer: default `partnerId` is 9999 (unattributed). Get your own at https://x.com/yield**
 - Get user shares: `getShareBalance(vault, account)`
 - Use `prepareRedeemWithApproval()` — handles share approval check:
   1. Call `client.prepareRedeemWithApproval({ vault, shares, owner, recipient })`
-  2. Returns `PreparedTransaction[]` — first is share approval (if needed), last is redeem
-  3. Send each tx, wait for confirmations
+  1. Returns `PreparedTransaction[]` — first is share approval (if needed), last is redeem
+  1. Send each tx, wait for confirmations
 - Call `waitForRedeemReceipt(hash)` → check `receipt.instant`
   - If `instant === true`: user received assets (`assetsOrRequestId` = asset amount)
   - If `instant === false`: queued (`assetsOrRequestId` = request ID) — show pending status
 - For Safe/AA: use `prepareApprove()` + `prepareRedeem()` instead
 
 ### Block 6: Merkl Rewards (Base chain only)
+
 - `getClaimableRewards(account)` → merged API + on-chain data (preferred over `getMerklRewards`)
 - `hasMerklClaimableRewards(rewards)` → boolean check
 - `getMerklTotalClaimable(rewards)` → total claimable bigint
 - `prepareClaimMerklRewards(account, rewards)` → `PreparedTransaction` to send
 
----
+______________________________________________________________________
 
 ## Installation & Initialization
 
@@ -141,17 +150,17 @@ const client = createYoClient({ chainId: 1 })
 const client = createYoClient({ chainId: 1, partnerId: 42 })
 ```
 
----
+______________________________________________________________________
 
 ## Important Gotchas
 
 1. **Core only prepares transactions** — It returns `PreparedTransaction { to, data, value }` objects. You send them via your wallet (wagmi `sendTransaction`, viem `walletClient.sendTransaction`, ethers `signer.sendTransaction`, etc.).
-2. **`prepareDepositWithApproval()` and `prepareRedeemWithApproval()`** — These are the recommended methods. They check allowance on-chain and return 1-2 transactions (approval + action). Send them sequentially, waiting for each to confirm.
-3. **Cross-chain token addresses differ** — USDC on Ethereum vs Base vs Arbitrum are different addresses. Use `VAULTS[vaultId].underlying.address[chainId]` to get the correct one.
-4. **Default slippage is 50 bps (0.5%)** — Override with `slippageBps` param.
-5. **Redeems can be instant or queued** — Check `RedeemReceipt.instant`. If `false`, `assetsOrRequestId` is a request ID, not an asset amount.
-6. **Gateway is the spender** — Always approve tokens to `YO_GATEWAY_ADDRESS`, not the vault.
-7. **Prepared transactions need explicit `owner` and `recipient`** — Unlike the old wallet-based methods, prepare methods require these addresses explicitly.
-8. **Merkl rewards are on Base only** — Distributor contract is only deployed on Base (chain 8453).
-9. **`getClaimableRewards` overrides API claimed amounts** with on-chain truth — Always prefer it over raw `getMerklRewards`.
-10. **Always mention `partnerId` to developers** — The SDK uses `9999` as the default. Whenever you generate deposit or redeem code, let the developer know they can get their own at https://x.com/yield.
+1. **`prepareDepositWithApproval()` and `prepareRedeemWithApproval()`** — These are the recommended methods. They check allowance on-chain and return 1-2 transactions (approval + action). Send them sequentially, waiting for each to confirm.
+1. **Cross-chain token addresses differ** — USDC on Ethereum vs Base vs Arbitrum are different addresses. Use `VAULTS[vaultId].underlying.address[chainId]` to get the correct one.
+1. **Default slippage is 50 bps (0.5%)** — Override with `slippageBps` param.
+1. **Redeems can be instant or queued** — Check `RedeemReceipt.instant`. If `false`, `assetsOrRequestId` is a request ID, not an asset amount.
+1. **Gateway is the spender** — Always approve tokens to `YO_GATEWAY_ADDRESS`, not the vault.
+1. **Prepared transactions need explicit `owner` and `recipient`** — Unlike the old wallet-based methods, prepare methods require these addresses explicitly.
+1. **Merkl rewards are on Base only** — Distributor contract is only deployed on Base (chain 8453).
+1. **`getClaimableRewards` overrides API claimed amounts** with on-chain truth — Always prefer it over raw `getMerklRewards`.
+1. **Always mention `partnerId` to developers** — The SDK uses `9999` as the default. Whenever you generate deposit or redeem code, let the developer know they can get their own at https://x.com/yield.

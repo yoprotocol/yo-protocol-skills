@@ -1,6 +1,7 @@
 # @yo-protocol/react Hooks API Reference
 
 ## Table of Contents
+
 - [Query Hook Pattern](#query-hook-pattern)
 - [Action Hook Pattern](#action-hook-pattern)
 - [Vault On-Chain Hooks](#vault-on-chain-hooks)
@@ -15,6 +16,7 @@
 ## Query Hook Pattern
 
 All read hooks follow this pattern:
+
 ```tsx
 function useXxx(params, options?: { enabled?: boolean }) {
   const client = useYoClient()
@@ -33,6 +35,7 @@ Every query hook returns: `{ data, isLoading, isError, error, refetch }`
 ## Action Hook Pattern
 
 All transaction hooks follow the prepare+send pattern:
+
 ```tsx
 function useXxx(options: { vault, callbacks }) {
   const client = useYoClient()
@@ -47,6 +50,7 @@ function useXxx(options: { vault, callbacks }) {
 ## Vault On-Chain Hooks
 
 ### useVaultState(vault, options?)
+
 ```tsx
 useVaultState(vault: Address | VaultId, options?: { enabled?: boolean })
 → { vaultState: VaultState | undefined, isLoading, isError, error, refetch }
@@ -57,6 +61,7 @@ useVaultState(vault: Address | VaultId, options?: { enabled?: boolean })
 `VaultState`: `{ address, name, symbol, decimals, totalAssets, totalSupply, asset, assetDecimals, exchangeRate }`
 
 ### usePreviewDeposit(vault, assets, options?)
+
 ```tsx
 usePreviewDeposit(vault: Address | VaultId, assets: bigint | undefined, options?: { enabled?: boolean })
 → { shares: bigint | undefined, isLoading, isError, error, refetch }
@@ -64,6 +69,7 @@ usePreviewDeposit(vault: Address | VaultId, assets: bigint | undefined, options?
 ```
 
 ### usePreviewRedeem(vault, shares, options?)
+
 ```tsx
 usePreviewRedeem(vault: Address | VaultId, shares: bigint | undefined, options?: { enabled?: boolean })
 → { assets: bigint | undefined, isLoading, isError, error, refetch }
@@ -73,6 +79,7 @@ usePreviewRedeem(vault: Address | VaultId, shares: bigint | undefined, options?:
 ## Vault API Hooks
 
 ### useVaults(options?)
+
 ```tsx
 useVaults(options?: { enabled?: boolean })
 → { vaults: VaultConfig[], isLoading, isError, error }
@@ -81,6 +88,7 @@ useVaults(options?: { enabled?: boolean })
 ```
 
 ### useVaultStats(options?)
+
 ```tsx
 useVaultStats(options?: { enabled?: boolean })
 → { stats: VaultStatsItem[], isLoading, isError, error, refetch }
@@ -88,6 +96,7 @@ useVaultStats(options?: { enabled?: boolean })
 ```
 
 ### useVaultSnapshot(vault, options?)
+
 ```tsx
 useVaultSnapshot(vault: Address | VaultId, options?: { enabled?: boolean })
 → { snapshot: VaultSnapshot | undefined, isLoading, isError, error, refetch }
@@ -95,6 +104,7 @@ useVaultSnapshot(vault: Address | VaultId, options?: { enabled?: boolean })
 ```
 
 ### useVaultSnapshots(options?)
+
 ```tsx
 useVaultSnapshots(options?: { enabled?: boolean })
 → { snapshots: VaultSnapshot[], isLoading, isError, error, refetch }
@@ -102,6 +112,7 @@ useVaultSnapshots(options?: { enabled?: boolean })
 ```
 
 ### useVaultHistory(vault, options?)
+
 ```tsx
 useVaultHistory(vault: Address | VaultId, options?: { enabled?: boolean })
 → { yieldHistory: TimeseriesPoint[], tvlHistory: TimeseriesPoint[], isLoading, isError, error, refetch }
@@ -109,6 +120,7 @@ useVaultHistory(vault: Address | VaultId, options?: { enabled?: boolean })
 ```
 
 ### useVaultTransactionHistory(vault, options?)
+
 ```tsx
 useVaultTransactionHistory(vault: Address | VaultId, options?: {
   limit?: number; cursor?: string; filters?: string; allNetworks?: boolean; enabled?: boolean
@@ -118,6 +130,7 @@ useVaultTransactionHistory(vault: Address | VaultId, options?: {
 ```
 
 ### useGlobalVaultHistory(options?)
+
 ```tsx
 useGlobalVaultHistory(options?: { cursor?: string; limit?: number; filters?: string; enabled?: boolean })
 → { history: GlobalVaultHistoryResponse | undefined, isLoading, isError, error, refetch }
@@ -125,6 +138,7 @@ useGlobalVaultHistory(options?: { cursor?: string; limit?: number; filters?: str
 ```
 
 ### useVaultPerformance(vault, options?)
+
 ```tsx
 useVaultPerformance(vault: Address | VaultId, options?: { enabled?: boolean })
 → { performance: VaultPerformance | undefined, isLoading, isError, error, refetch }
@@ -132,6 +146,7 @@ useVaultPerformance(vault: Address | VaultId, options?: { enabled?: boolean })
 ```
 
 ### useVaultPercentile(vault, options?)
+
 ```tsx
 useVaultPercentile(vault: Address | VaultId, options?: { enabled?: boolean })
 → { percentile: VaultPercentile | undefined, isLoading, isError, error, refetch }
@@ -139,6 +154,7 @@ useVaultPercentile(vault: Address | VaultId, options?: { enabled?: boolean })
 ```
 
 ### usePerformanceBenchmark(vault, options?)
+
 ```tsx
 usePerformanceBenchmark(vault: Address | VaultId, options?: { enabled?: boolean })
 → { benchmark: PerformanceBenchmark | undefined, isLoading, isError, error, refetch }
@@ -146,6 +162,7 @@ usePerformanceBenchmark(vault: Address | VaultId, options?: { enabled?: boolean 
 ```
 
 ### useVaultAllocations(vault, options?)
+
 ```tsx
 useVaultAllocations(vault: Address | VaultId, options?: { enabled?: boolean })
 → { allocations: DailyAllocationSnapshot[], isLoading, isError, error, refetch }
@@ -153,6 +170,7 @@ useVaultAllocations(vault: Address | VaultId, options?: { enabled?: boolean })
 ```
 
 ### useVaultPendingRedeems(vault, options?)
+
 ```tsx
 useVaultPendingRedeems(vault: Address | VaultId, options?: { enabled?: boolean })
 → { pendingRedeems: FormattedValue | undefined, isLoading, isError, error, refetch }
@@ -160,6 +178,7 @@ useVaultPendingRedeems(vault: Address | VaultId, options?: { enabled?: boolean }
 ```
 
 ### useSharePriceHistory(vault, options?)
+
 ```tsx
 useSharePriceHistory(vault: Address | VaultId, options?: { enabled?: boolean })
 → { history: SharePriceHistoryPoint[], isLoading, isError, error, refetch }
@@ -167,6 +186,7 @@ useSharePriceHistory(vault: Address | VaultId, options?: { enabled?: boolean })
 ```
 
 ### useTotalTvl(options?)
+
 ```tsx
 useTotalTvl(options?: { enabled?: boolean })
 → { tvl: TotalTvlTimeseriesPoint[], isLoading, isError, error, refetch }
@@ -174,6 +194,7 @@ useTotalTvl(options?: { enabled?: boolean })
 ```
 
 ### usePrices(options?)
+
 ```tsx
 usePrices(options?: { enabled?: boolean })
 → { prices: PriceMap, isLoading, isError, error, refetch }
@@ -183,6 +204,7 @@ usePrices(options?: { enabled?: boolean })
 ## User On-Chain Hooks
 
 ### useUserPosition(vault, account?, options?)
+
 ```tsx
 useUserPosition(vault: Address | VaultId, account?: Address, options?: { enabled?: boolean })
 → { position: UserVaultPosition | undefined, isLoading, isError, error, refetch }
@@ -194,6 +216,7 @@ useUserPosition(vault: Address | VaultId, account?: Address, options?: { enabled
 `UserVaultPosition`: `{ shares: bigint, assets: bigint }`
 
 ### useUserPositions(account?, options?)
+
 ```tsx
 useUserPositions(account?: Address, options?: { enabled?: boolean })
 → { positions: Array<{ vault, position: UserVaultPosition }>, isLoading, isError, error, refetch }
@@ -201,6 +224,7 @@ useUserPositions(account?: Address, options?: { enabled?: boolean })
 ```
 
 ### useTokenBalance(token, account?, options?)
+
 ```tsx
 useTokenBalance(token: Address | undefined, account?: Address, options?: { enabled?: boolean })
 → { balance: TokenBalance | undefined, isLoading, isError, error, refetch }
@@ -208,6 +232,7 @@ useTokenBalance(token: Address | undefined, account?: Address, options?: { enabl
 ```
 
 ### useShareBalance(vault, account?, options?)
+
 ```tsx
 useShareBalance(vault: Address | VaultId, account?: Address, options?: { enabled?: boolean })
 → { shares: bigint | undefined, isLoading, isError, error, refetch }
@@ -215,6 +240,7 @@ useShareBalance(vault: Address | VaultId, account?: Address, options?: { enabled
 ```
 
 ### useAllowance(token, spender, owner?, options?)
+
 ```tsx
 useAllowance(token: Address | undefined, spender: Address | undefined, owner?: Address, options?: { enabled?: boolean })
 → { allowance: TokenAllowance | undefined, isLoading, isError, error, refetch }
@@ -224,6 +250,7 @@ useAllowance(token: Address | undefined, spender: Address | undefined, owner?: A
 ## User API Hooks
 
 ### useUserHistory(vault, user?, options?)
+
 ```tsx
 useUserHistory(vault: Address | VaultId, user?: Address, options?: { limit?: number; enabled?: boolean })
 → { history: UserHistoryItem[], isLoading, isError, error, refetch }
@@ -231,6 +258,7 @@ useUserHistory(vault: Address | VaultId, user?: Address, options?: { limit?: num
 ```
 
 ### useUserPerformance(vault, user?, options?)
+
 ```tsx
 useUserPerformance(vault: Address | VaultId, user?: Address, options?: { enabled?: boolean })
 → { performance: UserPerformance | undefined, isLoading, isError, error, refetch }
@@ -238,6 +266,7 @@ useUserPerformance(vault: Address | VaultId, user?: Address, options?: { enabled
 ```
 
 ### useUserSnapshots(vault, user?, options?)
+
 ```tsx
 useUserSnapshots(vault: Address | VaultId, user?: Address, options?: { enabled?: boolean })
 → { snapshots: UserSnapshot[], isLoading, isError, error, refetch }
@@ -245,6 +274,7 @@ useUserSnapshots(vault: Address | VaultId, user?: Address, options?: { enabled?:
 ```
 
 ### useUserBalances(user?, options?)
+
 ```tsx
 useUserBalances(user?: Address, options?: { enabled?: boolean })
 → { balances: UserBalances | undefined, isLoading, isError, error, refetch }
@@ -252,6 +282,7 @@ useUserBalances(user?: Address, options?: { enabled?: boolean })
 ```
 
 ### usePendingRedemptions(vault, user?, options?)
+
 ```tsx
 usePendingRedemptions(vault: Address | VaultId, user?: Address, options?: { enabled?: boolean })
 → { pendingRedemptions: PendingRedeem | undefined, isLoading, isError, error, refetch }
@@ -259,6 +290,7 @@ usePendingRedemptions(vault: Address | VaultId, user?: Address, options?: { enab
 ```
 
 ### useUserRewards(tokenAddress, user?, options?)
+
 ```tsx
 useUserRewards(tokenAddress: string, user?: Address, options?: { enabled?: boolean })
 → { rewards: UserRewardsByAssetResponse | undefined, isLoading, isError, error, refetch }
@@ -268,6 +300,7 @@ useUserRewards(tokenAddress: string, user?: Address, options?: { enabled?: boole
 ## Leaderboard Hooks
 
 ### useLeaderboard(period, tokenAddress, options?)
+
 ```tsx
 useLeaderboard(period: 'weekly' | 'allTime', tokenAddress: string, options?: { enabled?: boolean })
 → { data: WeeklyRewardsResponse | AllTimeRewardsResponse | undefined, isLoading, isError, error, refetch }
@@ -278,6 +311,7 @@ useLeaderboard(period: 'weekly' | 'allTime', tokenAddress: string, options?: { e
 ## Merkl Hooks
 
 ### useMerklCampaigns(options?)
+
 ```tsx
 useMerklCampaigns(options?: { status?: MerklCampaignStatus; enabled?: boolean })
 → { campaigns: MerklCampaign[], isLoading, isError, error, refetch }
@@ -285,6 +319,7 @@ useMerklCampaigns(options?: { status?: MerklCampaignStatus; enabled?: boolean })
 ```
 
 ### useMerklRewards(account?, options?)
+
 ```tsx
 useMerklRewards(account?: Address, options?: { enabled?: boolean })
 → { rewards: MerklChainRewards | undefined, totalClaimable: bigint, hasClaimable: boolean, isLoading, isError, error, refetch }
@@ -296,6 +331,7 @@ useMerklRewards(account?: Address, options?: { enabled?: boolean })
 ## Action Hooks
 
 ### useDeposit(options)
+
 ```tsx
 useDeposit(options: {
   vault: Address | VaultId
@@ -319,6 +355,7 @@ useDeposit(options: {
 ```
 
 ### useRedeem(options)
+
 ```tsx
 useRedeem(options: {
   vault: Address | VaultId
@@ -343,6 +380,7 @@ useRedeem(options: {
 ```
 
 ### useApprove(options)
+
 ```tsx
 useApprove(options: {
   token: Address
@@ -364,6 +402,7 @@ useApprove(options: {
 ```
 
 ### useClaimMerklRewards(options?)
+
 ```tsx
 useClaimMerklRewards(options?: {
   onSubmitted?: (hash: Hash) => void
@@ -385,6 +424,7 @@ useClaimMerklRewards(options?: {
 ## Context & Utility Hooks
 
 ### useYieldConfig()
+
 ```tsx
 useYieldConfig()
 → { ready: boolean, partnerId?: number, defaultSlippageBps: number, onError?: (error: Error) => void }
@@ -392,6 +432,7 @@ useYieldConfig()
 ```
 
 ### useYoClient()
+
 ```tsx
 useYoClient()
 → YoClient | null
@@ -399,6 +440,7 @@ useYoClient()
 ```
 
 ### useCreateYoClient(options)
+
 ```tsx
 useCreateYoClient(options: {
   chainId: number
