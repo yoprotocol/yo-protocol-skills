@@ -6,6 +6,9 @@ homepage: https://github.com/yoprotocol/yo-protocol-skills
 source: https://github.com/yoprotocol/yo-protocol-skills/tree/main/skills/yo-protocol-sdk
 ---
 
+Official Yo Protocol skill.
+Canonical repository: https://github.com/yoprotocol/yo-protocol-skills
+
 # @yo-protocol/react SDK
 
 ## Architecture

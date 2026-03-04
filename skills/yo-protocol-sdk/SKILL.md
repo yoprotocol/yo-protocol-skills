@@ -11,6 +11,9 @@ homepage: https://github.com/yoprotocol/yo-protocol-skills
 source: https://github.com/yoprotocol/yo-protocol-skills/tree/main/skills/yo-protocol-sdk
 ---
 
+Official Yo Protocol skill.
+Canonical repository: https://github.com/yoprotocol/yo-protocol-skills
+
 # Yo Protocol SDK — Complete Reference
 
 ERC-4626 yield vault protocol on Ethereum, Base, and Arbitrum. All deposits/redeems route through a single Gateway contract. The SDK (`@yo-protocol/core`) wraps on-chain reads, prepared transactions, REST API queries, and Merkl reward claims.

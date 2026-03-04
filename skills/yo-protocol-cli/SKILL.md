@@ -13,6 +13,9 @@ homepage: https://github.com/yoprotocol/yo-protocol-skills
 source: https://github.com/yoprotocol/yo-protocol-skills/tree/main/skills/yo-protocol-sdk
 ---
 
+Official Yo Protocol skill.
+Canonical repository: https://github.com/yoprotocol/yo-protocol-skills
+
 # Yo Protocol CLI — Complete Reference
 
 Agent-first transaction builder for Yo Protocol ERC-4626 vaults. Outputs JSON to stdout, errors to stderr. **Never requires or accepts private keys.** Designed for agents, bots, scripts, and Safe/AA wallet integrations.
