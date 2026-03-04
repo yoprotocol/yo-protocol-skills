@@ -8,6 +8,9 @@ description: >
   on-chain vault state or balances via RPC, fetching off-chain snapshots/yield/TVL/user data from the
   Yo API, or piping CLI output into other tools. Triggers on mentions of yo CLI, yo command, yo prepare,
   yo read, yo api, yo info, yo schema, @yo-protocol/cli, or agent-first transaction building for Yo Protocol.
+author: yoprotocol
+homepage: https://github.com/yoprotocol/yo-protocol-skills
+source: https://github.com/yoprotocol/yo-protocol-skills/tree/main/skills/yo-protocol-sdk
 ---
 
 # Yo Protocol CLI — Complete Reference

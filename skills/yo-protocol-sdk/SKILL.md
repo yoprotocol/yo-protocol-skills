@@ -6,6 +6,9 @@ description: >
   Yo Protocol vaults: preparing deposit/redeem transactions, checking positions, querying vault snapshots/yield/TVL,
   or claiming Merkl rewards. Triggers on mentions of Yo Protocol, yoETH, yoUSD, yoBTC, yoEUR, yoGOLD, yoUSDT,
   yo-protocol/core, YoClient, createYoClient, PreparedTransaction, or ERC-4626 vault interactions via the Yo gateway.
+author: yoprotocol
+homepage: https://github.com/yoprotocol/yo-protocol-skills
+source: https://github.com/yoprotocol/yo-protocol-skills/tree/main/skills/yo-protocol-sdk
 ---
 
 # Yo Protocol SDK — Complete Reference
