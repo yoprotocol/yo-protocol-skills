@@ -1,34 +1,38 @@
-# yo-protocol-skills
+# Agent Skills
 
-Claude skills for [Yo Protocol](https://yo.xyz) — ERC-4626 yield vaults on Ethereum, Base, and Arbitrum.
+Claude Code skills for [YO Protocol](https://yo.xyz).
 
 ## Skills
 
-### [`yo-protocol-sdk`](./skills/yo-protocol-sdk/SKILL.md)
+| Skill                                                    | Description                                                                                                                       |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| [`yo-protocol-sdk`](skills/yo-protocol-sdk/SKILL.md)     | Build applications with `@yo-protocol/core` — deposits, redeems, positions, prepared transactions, vault snapshots, Merkl rewards |
+| [`yo-protocol-react`](skills/yo-protocol-react/SKILL.md) | React hooks and components for `@yo-protocol/react` — YieldProvider, query/action hooks, migration from yo-kit                    |
+| [`yo-protocol-cli`](skills/yo-protocol-cli/SKILL.md)     | Agent-first CLI (`@yo-protocol/cli`) — `yo prepare`, `yo read`, `yo api`, `yo info`, `yo schema`, JSON output, no private keys    |
+| [`yo-design`](skills/yo-design/SKILL.md)                 | Production-grade React + Tailwind v4 interfaces in YO's dark-theme aesthetic                                                      |
 
-Build applications with `@yo-protocol/core`. Covers depositing, redeeming, checking positions, prepared transactions for Safe/AA wallets, querying vault snapshots/yield/TVL, and claiming Merkl rewards.
+## Installation
 
-### [`yo-protocol-cli`](./skills/yo-protocol-cli/SKILL.md)
+Install all skills into your Claude Code agents directory:
 
-Use the `@yo-protocol/cli` agent-first transaction builder. Covers `yo info`, `yo read`, `yo prepare`, `yo api`, and `yo schema` — outputs structured JSON, never requires private keys.
+```bash
+just install-all yoprotocol/agent-skills
+```
 
-## Usage
+Or sync from this repo (commits here, installs to `~/.agents`, commits there):
 
-These skills are auto-indexed by [SkillsMP](https://skillsmp.com). To use them locally, copy the relevant `SKILL.md` into your `.claude/skills/` directory.
+```bash
+just sync
+```
 
-## Vaults
+## Development
 
-| Vault  | Underlying | Chains                   |
-| ------ | ---------- | ------------------------ |
-| yoETH  | WETH       | Ethereum, Base           |
-| yoBTC  | cbBTC      | Ethereum, Base           |
-| yoUSD  | USDC       | Ethereum, Base, Arbitrum |
-| yoEUR  | EURC       | Ethereum, Base           |
-| yoGOLD | XAUt       | Ethereum                 |
-| yoUSDT | USDT       | Ethereum                 |
+| Command     | Description                                         |
+| ----------- | --------------------------------------------------- |
+| `just sync` | Commit, install skills to `~/.agents`, commit there |
+| `just mw`   | Format markdown files                               |
+| `just mc`   | Check markdown formatting                           |
 
-## Links
+## License
 
-- [Yo Protocol](https://yo.xyz)
-- [npm: @yo-protocol/core](https://www.npmjs.com/package/@yo-protocol/core)
-- [X / Twitter](https://x.com/yield)
+[MIT](LICENSE)
