@@ -13,13 +13,7 @@ Claude Code skills for [YO Protocol](https://yo.xyz).
 
 ## Installation
 
-Install all skills into your Claude Code agents directory:
-
-```bash
-just install-all yoprotocol/agent-skills
-```
-
-Or sync from this repo (commits here, installs to `~/.agents`, commits there):
+Sync from this repo — commits here, installs skills to `~/.agents`, commits there:
 
 ```bash
 just sync
