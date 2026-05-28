@@ -1,70 +1,90 @@
 ---
 name: yo-protocol-cli
 description: >-
-  ALWAYS use this skill when the user mentions the Yo Protocol CLI, the `yo` command, `@yo-protocol/cli`,
-  or wants to interact with Yo Protocol vaults (yoETH, yoUSD, yoBTC, yoEUR, yoGOLD, yoUSDT) from a shell
-  script, terminal, or command line. This skill covers the `yo` binary — an agent-first transaction builder
-  that outputs JSON to stdout for ERC-4626 yield vaults on Ethereum, Base, and Arbitrum. Use it for:
-  building unsigned calldata for Safe/AA wallets (`yo prepare`), querying on-chain vault state via RPC
-  (`yo read`), fetching yield/TVL/snapshot data from the REST API (`yo api`), listing vaults and chains
-  (`yo info`), piping output into jq or other tools, setting up YO_RPC_URL, or any bash/shell automation
-  involving Yo Protocol. Also trigger when the user asks about vault exchange rates, share balances, pending
-  redemptions, or deposit previews in a scripting context. Do NOT use for React hooks (@yo-protocol/react)
-  or TypeScript SDK code (@yo-protocol/core) — those have dedicated skills.
+  ALWAYS use this skill when the user mentions the YO Protocol CLI, the `yo`
+  command, `@yo-protocol/cli`, or wants to interact with YO Protocol vaults
+  (yoETH, yoUSD, yoBTC, yoEUR, yoGOLD, yoUSDT) from a shell script, terminal,
+  or command line. The `yo` binary is an agent-first interface for ERC-4626
+  yield vaults on Ethereum (1), Base (8453), and Arbitrum (42161). It outputs
+  structured JSON to stdout, never requires or accepts private keys, and
+  produces unsigned calldata routed through the YO Gateway — ready for
+  Safe/AA wallets and Base MCP `send_calls`. Use it for: building unsigned
+  transactions (`yo prepare {approve,deposit,redeem,deposit-with-approval}`),
+  reading positions and rewards (`yo position`, `yo portfolio`,
+  `yo pending-redeems`, `yo rewards`, `yo yo-rewards`, `yo user-perf`),
+  listing vaults and history (`yo vaults`, `yo vault`, `yo history`,
+  `yo prices`, `yo yield`, `yo tvl`, `yo share-price`, `yo perf`,
+  `yo leaderboard`), self-describing the command surface for an agent
+  (`yo schema`), setting up `YO_RPC_URL`, or piping output into jq or other
+  tools. Do NOT use for React hooks (`@yo-protocol/react`) or TypeScript SDK
+  code (`@yo-protocol/core`) — those have dedicated skills.
 author: yoprotocol
 homepage: https://github.com/yoprotocol/yo-protocol-skills
 source: https://github.com/yoprotocol/yo-protocol-skills/tree/main/skills/yo-protocol-cli
 ---
 
-Official Yo Protocol skill.
-Canonical repository: https://github.com/yoprotocol/yo-protocol-skills
+Official YO Protocol skill. Canonical repository: <https://github.com/yoprotocol/yo-protocol-skills>.
 
-# Yo Protocol CLI — Complete Reference
+# YO Protocol CLI — Reference
 
-Agent-first transaction builder for Yo Protocol ERC-4626 vaults. Outputs JSON to stdout, errors to stderr. **Never requires or accepts private keys.** Designed for agents, bots, scripts, and Safe/AA wallet integrations.
+Agent-first interface for YO Protocol ERC-4626 vaults. Outputs JSON to stdout, errors to stderr. **Never requires or accepts private keys.** Designed for agents, bots, scripts, Safe/AA wallets, and Base MCP `send_calls`.
+
+**Canonical source for the command surface is `yo schema`** — this file documents the same surface but `yo schema` is authoritative. If a command appears here but not in `yo schema`, trust the schema.
 
 ## Installation
 
 ```bash
-npm install @yo-protocol/cli
-# or
-pnpm add @yo-protocol/cli
+npm install -g @yo-protocol/cli
+# or run on demand without installing
+npx @yo-protocol/cli@latest <command>
 ```
 
-Binary: `yo` (or `npx yo`)
+Binary: `yo` (or `npx yo`). npm: <https://www.npmjs.com/package/@yo-protocol/cli>.
 
-npm: https://www.npmjs.com/package/@yo-protocol/cli
+## Global options
 
-## Global Options
+Every command inherits these. The `--json` flag is **required for agent use** — without it, output is interactive/text and not parseable.
 
-Every command inherits these:
+| Flag              | Description                                                    | Default | Env          |
+| ----------------- | -------------------------------------------------------------- | ------- | ------------ |
+| `--rpc-url <url>` | RPC endpoint for on-chain reads                                | public  | `YO_RPC_URL` |
+| `--chain <id>`    | Chain ID: `1` (Ethereum), `8453` (Base), or `42161` (Arbitrum) | `1`     | —            |
+| `--json`          | Force JSON output (agent compat). **Use on every agent call.** | off     | —            |
+| `--raw`           | Treat amounts as raw bigint strings (skip decimal conversion)  | off     | —            |
+| `-V, --version`   | Print version                                                  | —       | —            |
+| `-h, --help`      | Help (per command and global)                                  | —       | —            |
 
-| Flag              | Description                                                   | Default | Env          |
-| ----------------- | ------------------------------------------------------------- | ------- | ------------ |
-| `--rpc-url <url>` | RPC endpoint                                                  | —       | `YO_RPC_URL` |
-| `--chain <id>`    | Chain ID: `1`, `8453`, or `42161`                             | `1`     | —            |
-| `--raw`           | Treat amounts as raw bigint strings (skip decimal conversion) | `false` | —            |
+**Public RPC rate-limits aggressively.** For any command that touches chain state (`position`, `portfolio`, `rewards`, etc.), set `YO_RPC_URL` to a paid endpoint:
 
-## Output Format
+```bash
+export YO_RPC_URL=https://base-mainnet.g.alchemy.com/v2/<KEY>
+```
 
-All commands print a single JSON line to stdout:
+## Output shape
+
+Prepare commands return `{ ok, result }`. Read commands return either `{ ok, result }` or bare JSON — vary by command, never both. Errors always return:
 
 ```json
-// Success
-{ "ok": true, "result": <data> }
-
-// Error (to stderr)
-{ "ok": false, "error": { "code": "INVALID_VAULT", "message": "..." } }
+{ "ok": false, "error": { "code": "<CODE>", "message": "..." } }
 ```
 
-- Bigints are serialized as strings
-- Fields with known decimals include a `_formatted` companion (e.g. `balance` + `balance_formatted`)
+Error codes: `INVALID_VAULT`, `INVALID_AMOUNT`, `INVALID_ADDRESS`, `INVALID_CHAIN`, `RPC_ERROR`, `API_ERROR`, `UNKNOWN_ERROR`.
 
-Error codes: `INVALID_VAULT`, `INVALID_AMOUNT`, `INVALID_ADDRESS`, `INVALID_CHAIN`, `RPC_ERROR`, `API_ERROR`, `UNKNOWN_ERROR`
+Bigints are serialized as strings. Decimal-aware fields have a `_formatted` companion (e.g. `balance` + `balance_formatted`, `assets` + `assets_formatted`).
 
-## Vault Identifiers
+## Supported chains
 
-Vaults can be referenced by ID or address. Use `yo info vaults` to list all.
+Vaults and the YO Gateway are deployed on three chains:
+
+| Chain ID | Network    | `--chain` value |
+| -------- | ---------- | --------------- |
+| `1`      | `ethereum` | `1`             |
+| `8453`   | `base`     | `8453`          |
+| `42161`  | `arbitrum` | `42161`         |
+
+YO Gateway address (same on every chain): `0xF1EeE0957267b1A474323Ff9CfF7719E964969FA`.
+
+## Vault catalog
 
 | ID       | Address                                      | Underlying | Decimals | Chains         |
 | -------- | -------------------------------------------- | ---------- | -------- | -------------- |
@@ -75,342 +95,294 @@ Vaults can be referenced by ID or address. Use `yo info vaults` to list all.
 | `yoGOLD` | `0x586675A3a46B008d8408933cf42d8ff6c9CC61a1` | XAUt       | 6        | 1              |
 | `yoUSDT` | `0xb9a7da9e90d3b428083bae04b860faa6325b721e` | USDT       | 6        | 1              |
 
-Gateway address: `0xF1EeE0957267b1A474323Ff9CfF7719E964969FA`
+Vault IDs (e.g. `yoUSD`) and addresses are interchangeable wherever a `<vault>` argument is accepted. Run `yo --json vaults` for live APY/TVL.
 
 ______________________________________________________________________
 
-## Command Groups
+## Commands
 
-### 1. `yo info` — Local Lookups (no RPC)
+### Discovery
 
-#### `yo info vaults`
+#### `yo schema`
 
-List all known vaults. Respects `--chain` to filter.
+Print the full CLI schema (vaults, chains, gateway, every command with options) as JSON. **Source of truth for agent discovery.**
 
 ```bash
-yo info vaults
-yo info vaults --chain 8453
+yo --json schema
 ```
 
-Returns array of `{ id, name, address, underlying, decimals, chains }`.
+### Read commands (vaults, positions, rewards)
 
-#### `yo info resolve <vaultOrId>`
+#### `yo vaults`
 
-Resolve a vault ID (e.g. `yoETH`) or address to full config.
+List all vaults with APY and TVL for the active `--chain`.
 
 ```bash
-yo info resolve yoETH
-yo info resolve 0x3a43aec53490cb9fa922847385d82fe25d0e9de7
+yo --chain 8453 --json vaults
 ```
 
-Returns `{ address, id, name, underlying: { symbol, decimals }, chains }`.
+#### `yo vault <id>`
 
-#### `yo info chains`
-
-List supported chains.
+Detailed info for a single vault.
 
 ```bash
-yo info chains
+yo --chain 8453 --json vault yoUSD
 ```
 
-Returns array of `{ chainId, network }`.
+#### `yo position <vault> --user <addr>`
 
-______________________________________________________________________
-
-### 2. `yo read` — On-Chain Queries (requires RPC)
-
-All `read` commands need an RPC endpoint via `--rpc-url` or `YO_RPC_URL`.
-
-#### `yo read vault-state --vault <id|addr>`
-
-Full on-chain vault state.
+User's shares + asset value in one vault on the active chain. Reads `balanceOf` and `convertToAssets` on-chain (matches the dapp). Requires `--rpc-url` or `YO_RPC_URL`.
 
 ```bash
-yo read vault-state --vault yoUSD --rpc-url https://eth.llamarpc.com
+yo --chain 8453 --json position yoUSD --user 0xAbc...
 ```
 
-Returns `{ address, name, symbol, decimals, totalAssets, totalAssets_formatted, totalSupply, totalSupply_formatted, asset, assetDecimals, exchangeRate, exchangeRate_formatted }`.
+Returns: `{ vault, shares, assets, shares_formatted, assets_formatted }`.
 
-#### `yo read token-balance --token <addr> --account <addr>`
+#### `yo portfolio --user <addr>`
 
-ERC-20 token balance.
+User's positions across **all vaults and all chains** in one call.
 
 ```bash
-yo read token-balance \
-  --token 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48 \
-  --account 0xYourAddress
+yo --json portfolio --user 0xAbc...
 ```
 
-Returns `{ token, account, balance, balance_formatted, decimals }`.
+#### `yo pending-redeems <vault> --user <addr>`
 
-#### `yo read share-balance --vault <id|addr> --account <addr>`
-
-Vault share balance for an account.
+User's queued (async) redemption for a vault.
 
 ```bash
-yo read share-balance --vault yoETH --account 0xYourAddress
+yo --chain 8453 --json pending-redeems yoUSD --user 0xAbc...
 ```
 
-Returns `{ vault, account, balance, balance_formatted, decimals }`.
+Returns: `{ assets: {raw,formatted}, shares: {raw,formatted} }`. When `shares.raw == 0`, the redeem has settled (a YO solver auto-fulfills async redeems on-chain within ~24h; no user claim transaction).
 
-#### `yo read position --vault <id|addr> --account <addr>`
+#### `yo user-perf <vault> --user <addr>`
 
-User vault position (shares + asset value).
+User P&L for one vault (realized + unrealized).
 
 ```bash
-yo read position --vault yoUSD --account 0xYourAddress
+yo --chain 8453 --json user-perf yoUSD --user 0xAbc...
 ```
 
-Returns `{ vault, account, shares, shares_formatted, assets, assets_formatted, shareDecimals, assetDecimals }`.
+Returns: `{ realized: {raw,formatted}, unrealized: {raw,formatted} }`.
 
-#### `yo read allowance --token <addr> --owner <addr> [--spender <addr>]`
+#### `yo history <vault> [--user <addr>] [--limit <n>]`
 
-ERC-20 allowance. Spender defaults to Gateway.
+Transaction history for a vault (or for a user within a vault).
 
 ```bash
-yo read allowance \
-  --token 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48 \
-  --owner 0xYourAddress
+yo --chain 8453 --json history yoUSD --user 0xAbc... --limit 20
 ```
 
-Returns `{ token, owner, spender, allowance }`.
+#### `yo perf <vault>`
 
-#### `yo read preview-deposit --vault <id|addr> --amount <n>`
-
-Preview how many shares for a given asset deposit.
+Vault performance benchmark vs DeFiLlama peers (no user required).
 
 ```bash
-yo read preview-deposit --vault yoUSD --amount 100
+yo --chain 8453 --json perf yoUSD
 ```
 
-Returns `{ vault, assets, assets_formatted, shares, assetDecimals }`.
+#### `yo rewards --user <addr>`
 
-#### `yo read preview-redeem --vault <id|addr> --shares <n>`
-
-Preview how many assets for a given share redemption.
+Claimable Merkl rewards. Hybrid call: fetches proofs/amounts from Merkl's API, reads `claimed(user, token)` from the Merkl Distributor on-chain.
 
 ```bash
-yo read preview-redeem --vault yoUSD --shares 100
+yo --chain 8453 --json rewards --user 0xAbc...
 ```
 
-Returns `{ vault, shares, shares_formatted, assets, assets_formatted, shareDecimals, assetDecimals }`.
+Response mirrors the Merkl API: `[{ chain, rewards: [{ token, amount, claimed, pending, proofs, ... }] }, ...]`. Claimable = `amount - claimed`. `pending` is in dispute period and is **not** claimable yet.
 
-#### `yo read max-deposit --vault <id|addr> --receiver <addr>`
+The CLI does **not** prepare a Merkl claim transaction. Encode the call to the Merkl Distributor at `0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae` (Base) separately — see [yo-base-mcp-plugin/SKILL.md](../yo-base-mcp-plugin/SKILL.md) for the full claim flow.
 
-Maximum depositable amount for a receiver.
+#### `yo yo-rewards --user <addr>`
+
+`$YO` token rewards (season campaigns, RLP, airdrops) — separate from Merkl.
 
 ```bash
-yo read max-deposit --vault yoUSD --receiver 0xYourAddress
+yo --chain 8453 --json yo-rewards --user 0xAbc...
 ```
 
-Returns `{ vault, receiver, maxDeposit, maxDeposit_formatted, decimals }`.
+#### `yo leaderboard [--token <addr>]`
 
-#### `yo read max-redeem --vault <id|addr> --owner <addr>`
-
-Maximum redeemable shares for an owner.
+Top reward earners.
 
 ```bash
-yo read max-redeem --vault yoUSD --owner 0xYourAddress
+yo --chain 8453 --json leaderboard
 ```
 
-Returns `{ vault, owner, maxRedeem, maxRedeem_formatted, decimals }`.
+#### `yo prices`
 
-______________________________________________________________________
-
-### 3. `yo prepare` — Build Unsigned Transaction Calldata
-
-Build `{ to, data, value }` objects for Safe multisig, Account Abstraction, or any external signer. **No private keys needed.**
-
-#### `yo prepare approve --token <addr> --amount <n> [--spender <addr>] [--decimals <n>]`
-
-Build ERC-20 approve transaction. Spender defaults to Gateway. Fetches decimals from RPC if not provided and `--raw` is not set.
+Current asset prices used by the YO indexer.
 
 ```bash
-yo prepare approve \
-  --token 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48 \
-  --amount 1000 \
+yo --json prices
+```
+
+#### `yo yield <vault>` / `yo tvl <vault>` / `yo share-price <vault>`
+
+Historical time series for one vault.
+
+```bash
+yo --chain 8453 --json yield yoUSD
+yo --chain 8453 --json tvl yoUSD
+yo --chain 8453 --json share-price yoUSD
+```
+
+### Prepare commands (unsigned calldata)
+
+All prepare commands target the YO Gateway and produce unsigned `{ to, data, value }` ready for Safe / AA / Base MCP `send_calls`.
+
+#### `yo prepare approve`
+
+```bash
+yo --chain 8453 --json prepare approve \
+  --token 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 \
+  --amount 100 \
+  --spender 0xF1EeE0957267b1A474323Ff9CfF7719E964969FA \
   --decimals 6
 ```
 
-Returns `{ to, data, value }`.
+| Flag               | Required                | Default    | Notes                                                        |
+| ------------------ | ----------------------- | ---------- | ------------------------------------------------------------ |
+| `--token <addr>`   | yes                     | —          | ERC-20 to approve                                            |
+| `--amount <n>`     | yes                     | —          | Decimal amount unless `--raw`                                |
+| `--spender <addr>` | no                      | YO Gateway | Defaults to the YO Gateway                                   |
+| `--decimals <n>`   | required unless `--raw` | —          | Needed because the CLI doesn't always read decimals from RPC |
 
-#### `yo prepare deposit --vault <id|addr> --amount <n> [--recipient <addr>] [--slippage-bps <n>]`
+Returns: `{ ok: true, result: { to, data, value } }`.
 
-Build gateway deposit transaction.
+#### `yo prepare deposit`
 
-```bash
-yo prepare deposit --vault yoUSD --amount 100 --recipient 0xSafeAddress
-```
-
-Returns `{ to, data, value }`.
-
-#### `yo prepare redeem --vault <id|addr> --shares <n> [--recipient <addr>] [--slippage-bps <n>]`
-
-Build gateway redeem transaction.
+Build a YO Gateway deposit transaction. **Requires a separate approve to the Gateway first** (or use `deposit-with-approval` below).
 
 ```bash
-yo prepare redeem --vault yoUSD --shares 100 --recipient 0xSafeAddress
-```
-
-Returns `{ to, data, value }`.
-
-#### ~~`yo prepare deposit-with-approval`~~ — DEPRECATED, DO NOT USE
-
-This command is unreliable. **Always use separate `yo prepare approve` + `yo prepare deposit` instead.** When executing the transactions, wait for the approve tx to confirm on-chain before submitting the deposit tx.
-
-______________________________________________________________________
-
-### 4. `yo api` — Off-Chain API Queries (no RPC needed)
-
-Queries the Yo REST API (`https://api.yo.xyz`). Requires `--chain` to determine the network.
-
-#### `yo api vault-snapshot --vault <id|addr>`
-
-Comprehensive vault data: TVL, yield (1d/7d/30d), protocols, share price.
-
-```bash
-yo api vault-snapshot --vault yoUSD
-```
-
-#### `yo api vault-yield --vault <id|addr>`
-
-Historical yield timeseries. Returns `{ timestamp, value }[]`.
-
-```bash
-yo api vault-yield --vault yoETH
-```
-
-#### `yo api vault-tvl --vault <id|addr>`
-
-Historical TVL timeseries. Returns `{ timestamp, value }[]`.
-
-```bash
-yo api vault-tvl --vault yoETH
-```
-
-#### `yo api user-history --vault <id|addr> --user <addr> [--limit <n>]`
-
-User transaction history (deposits, withdraws, redeems).
-
-```bash
-yo api user-history --vault yoUSD --user 0xYourAddress --limit 10
-```
-
-#### `yo api user-pending --vault <id|addr> --user <addr>`
-
-User pending redemptions.
-
-```bash
-yo api user-pending --vault yoUSD --user 0xYourAddress
-```
-
-#### `yo api user-points --user <addr>`
-
-User points.
-
-```bash
-yo api user-points --user 0xYourAddress
-```
-
-______________________________________________________________________
-
-### 5. `yo schema` — Agent Discovery
-
-Output the full CLI schema as JSON for programmatic discovery.
-
-```bash
-yo schema
-```
-
-Returns complete schema with all commands, options, arguments, vault configs, chains, gateway address, and output format specs. Use this to build dynamic agent tooling on top of the CLI.
-
-______________________________________________________________________
-
-## Amount Handling
-
-- By default, amounts are **decimal strings** (e.g. `"100"` for 100 USDC). The CLI converts using the token's decimals.
-- With `--raw`, amounts are **raw bigint strings** (e.g. `"100000000"` for 100 USDC with 6 decimals). No conversion is applied.
-- For `prepare approve`, provide `--decimals` to skip an RPC call, or the CLI fetches decimals on-chain.
-- For known vaults, decimals are resolved from the built-in config. For unknown vault addresses, decimals are fetched via RPC.
-
-## Workflow Examples
-
-### Check vault state and deposit (Safe/AA)
-
-**Always use separate approve + deposit. Wait for approve tx confirmation before depositing.**
-
-```bash
-# 1. Check vault state
-yo read vault-state --vault yoUSD --rpc-url $YO_RPC_URL
-
-# 2. Check current allowance
-yo read allowance \
-  --token 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48 \
-  --owner 0xSafeAddress
-
-# 3. Build approve calldata (if allowance is insufficient)
-yo prepare approve \
-  --token 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48 \
-  --amount 1000 \
-  --decimals 6
-
-# 4. Submit approve tx → WAIT FOR CONFIRMATION before next step!
-
-# 5. Build deposit calldata
-yo prepare deposit \
+yo --chain 8453 --json prepare deposit \
   --vault yoUSD \
-  --amount 1000 \
-  --recipient 0xSafeAddress
-
-# 6. Submit deposit tx
+  --amount 100 \
+  --recipient 0xAbc... \
+  --slippage-bps 50
 ```
 
-### Query user position across chains
+| Flag                 | Required | Default | Notes                            |
+| -------------------- | -------- | ------- | -------------------------------- |
+| `--vault <id\|addr>` | yes      | —       | Vault ID or address              |
+| `--amount <n>`       | yes      | —       | Decimal unless `--raw`           |
+| `--recipient <addr>` | yes      | —       | Recipient of the minted shares   |
+| `--slippage-bps <n>` | no       | `50`    | Plain basis points (`50` = 0.5%) |
+
+Returns: `{ ok: true, result: { to: Gateway, data, value: "0" } }`.
+
+#### `yo prepare redeem`
+
+Build a YO Gateway redeem transaction. The Gateway routes to instant or async automatically based on idle balance. **The Gateway needs allowance on the user's vault shares** — first-time withdraws must include `prepare approve --token <vault> --spender <Gateway>` first (Uniswap-style, one-time `maxUint256`).
 
 ```bash
-# Ethereum
-yo read position --vault yoUSD --account 0xUser --chain 1 --rpc-url $ETH_RPC
-
-# Base
-yo read position --vault yoUSD --account 0xUser --chain 8453 --rpc-url $BASE_RPC
-
-# Arbitrum
-yo read position --vault yoUSD --account 0xUser --chain 42161 --rpc-url $ARB_RPC
+yo --chain 8453 --json prepare redeem \
+  --vault yoUSD \
+  --shares 5 \
+  --recipient 0xAbc... \
+  --slippage-bps 50
 ```
 
-### Pipe into jq for specific fields
+| Flag                 | Required | Default | Notes                                |
+| -------------------- | -------- | ------- | ------------------------------------ |
+| `--vault <id\|addr>` | yes      | —       | Vault ID or address                  |
+| `--shares <n>`       | yes      | —       | Share amount, decimal unless `--raw` |
+| `--recipient <addr>` | yes      | —       | Recipient of the underlying assets   |
+| `--slippage-bps <n>` | no       | `50`    | Plain basis points                   |
+
+Returns: `{ ok: true, result: { to: Gateway, data, value: "0" } }`.
+
+#### `yo prepare deposit-with-approval`
+
+Atomic approve + deposit, ready for `send_calls` as an ordered batch. Reads the user's current allowance on-chain and only includes an `approve` call if needed. **Preferred path for agent deposits.**
 
 ```bash
-yo api vault-snapshot --vault yoETH | jq '.result.stats.tvl.formatted'
-yo read vault-state --vault yoUSD | jq '.result.exchangeRate_formatted'
-yo info vaults | jq '.result[] | .id'
+yo --chain 8453 --json prepare deposit-with-approval \
+  --vault yoUSD \
+  --token 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 \
+  --owner 0xAbc... \
+  --recipient 0xAbc... \
+  --amount 100 \
+  --slippage-bps 50
 ```
 
-### Preview before building tx
+| Flag                 | Required | Default | Notes                             |
+| -------------------- | -------- | ------- | --------------------------------- |
+| `--vault <id\|addr>` | yes      | —       | Vault ID or address               |
+| `--token <addr>`     | yes      | —       | Underlying token to approve       |
+| `--owner <addr>`     | yes      | —       | Token owner (for allowance check) |
+| `--recipient <addr>` | yes      | —       | Recipient of minted shares        |
+| `--amount <n>`       | yes      | —       | Decimal unless `--raw`            |
+| `--slippage-bps <n>` | no       | `50`    | Plain basis points                |
+
+Returns: `{ ok: true, result: [ { to: token, data: approve, value: "0" }, { to: Gateway, data: deposit, value: "0" } ] }`. The approve element is omitted when allowance already covers the amount.
+
+______________________________________________________________________
+
+## Common workflows
+
+### Same-chain deposit (Safe / AA / Base MCP)
 
 ```bash
-# How many shares will 100 USDC get?
-yo read preview-deposit --vault yoUSD --amount 100
-
-# Build the actual deposit tx
-yo prepare deposit --vault yoUSD --amount 100 --recipient 0xSafeAddress
+yo --chain 8453 --json prepare deposit-with-approval \
+   --vault yoUSD \
+   --token 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 \
+   --owner   0xUser \
+   --recipient 0xUser \
+   --amount 100 \
+   --slippage-bps 50
 ```
 
-### Raw bigint mode (for programmatic use)
+Take `result[]` and submit as `send_calls(chain="base", calls=result[])`.
+
+### Withdraw
+
+First-time withdraws need a one-shot approval of vault shares to the Gateway:
 
 ```bash
-# Pass raw amounts — no decimal conversion
-yo prepare deposit --vault yoUSD --amount 100000000 --raw --recipient 0xSafe
-yo read preview-redeem --vault yoUSD --shares 100000000 --raw
+yo --chain 8453 --json prepare approve \
+   --token 0x0000000f2eB9f69274678c76222B35eEc7588a65 \
+   --spender 0xF1EeE0957267b1A474323Ff9CfF7719E964969FA \
+   --amount <max> --decimals 6
+
+yo --chain 8453 --json prepare redeem \
+   --vault yoUSD --shares 1 --recipient 0xUser --slippage-bps 50
 ```
 
-## Important Notes
+Submit both calls together via `send_calls`. After the first redeem on a given vault, the approve step can be skipped.
 
-1. **No private keys** — The CLI only builds calldata and queries state. Signing and submitting transactions is your responsibility.
-1. **`--chain` defaults to 1 (Ethereum)** — Always specify `--chain 8453` for Base or `--chain 42161` for Arbitrum.
-1. **RPC required for `read` and `prepare`** — Set `YO_RPC_URL` env var or pass `--rpc-url` per command. `info` and `api` commands don't need RPC.
-1. **Vault IDs are case-sensitive** — Use `yoETH`, not `yoeth` or `YOETH`.
-1. **Always use separate `prepare approve` + `prepare deposit`** — Do NOT use `deposit-with-approval`. Wait for the approve tx to confirm on-chain before submitting the deposit tx.
-1. **Default slippage is 50 bps (0.5%)** — Override with `--slippage-bps`.
-1. **Gateway is the spender** — Approvals should target the Gateway (`0xF1EeE0957267b1A474323Ff9CfF7719E964969FA`), not the vault.
-1. **Cross-chain token addresses differ** — USDC on Ethereum vs Base vs Arbitrum are different contracts. Use `yo info resolve` to look up vault details.
+### Check position & pending state
+
+```bash
+yo --chain 8453 --json position yoUSD --user 0xUser
+yo --chain 8453 --json pending-redeems yoUSD --user 0xUser
+yo --chain 8453 --json user-perf yoUSD --user 0xUser
+```
+
+### Discover everything programmatically
+
+```bash
+yo --json schema | jq '.commands[].name'
+```
+
+______________________________________________________________________
+
+## Notes for agent integrations
+
+- **Always pass `--json`.** Without it, output is interactive (TUI-flavoured text), not machine-parseable.
+- **Set `YO_RPC_URL`** to a paid RPC (Alchemy, Infura, …) — public endpoints rate-limit chain reads.
+- **Use vault IDs** (`yoUSD`) in commands, not addresses, when possible — fewer mistakes, easier to read in transcripts.
+- **Gateway is the spender** for both deposit (approve underlying) and redeem (approve vault shares). Default to `0xF1EeE0957267b1A474323Ff9CfF7719E964969FA`.
+- **Slippage is plain basis points.** `50` = 0.5%. CLI default 50; YO HTTP API `/transactions/zapIn` default 25.
+- **Partner ID `9999`** is baked into the Gateway calldata by the SDK. Apps with their own partner attribution should call `@yo-protocol/core` directly (see the SDK skill) — the CLI doesn't expose a `--partner-id` flag yet.
+- **Cross-chain deposits are not in this CLI.** Use the YO HTTP API at `GET https://api.yo.xyz/api/v1/transactions/zapIn` when `fromChainId != toChainId`.
+- **Merkl claims are not in this CLI.** Encode `claim(...)` on the Merkl Distributor directly (see [yo-base-mcp-plugin/SKILL.md](../yo-base-mcp-plugin/SKILL.md)).
+- **Errors** are JSON to stderr with `{ ok: false, error: { code, message } }`. If `ok == false`, stop — never invent replacement parameters.
+
+## Related
+
+- [`yo-base-mcp-plugin`](../yo-base-mcp-plugin/SKILL.md) — Base MCP plugin that wraps this CLI plus the YO HTTP API for chat-only surfaces.
+- [`yo-protocol-sdk`](../yo-protocol-sdk/SKILL.md) — `@yo-protocol/core` TypeScript SDK. The CLI is a thin shim over this; chain support, ABIs, and slippage math live in `core`.
+- [`yo-protocol-react`](../yo-protocol-react/SKILL.md) — React hooks/components.
