@@ -193,7 +193,7 @@ yo --chain 8453 --json rewards --user 0xAbc...
 
 Response mirrors the Merkl API: `[{ chain, rewards: [{ token, amount, claimed, pending, proofs, ... }] }, ...]`. Claimable = `amount - claimed`. `pending` is in dispute period and is **not** claimable yet.
 
-The CLI does **not** prepare a Merkl claim transaction. Encode the call to the Merkl Distributor at `0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae` (Base) separately — see [yo-mcp/SKILL.md](../yo-mcp/SKILL.md) for the full claim flow.
+The CLI does **not** prepare a Merkl claim transaction. Encode the call to the Merkl Distributor at `0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae` (Base) separately — see [yo-base-mcp-plugin/SKILL.md](../yo-base-mcp-plugin/SKILL.md) for the full claim flow.
 
 #### `yo yo-rewards --user <addr>`
 
@@ -378,11 +378,11 @@ ______________________________________________________________________
 - **Slippage is plain basis points.** `50` = 0.5%. CLI default 50; YO HTTP API `/transactions/zapIn` default 25.
 - **Partner ID `9999`** is baked into the Gateway calldata by the SDK. Apps with their own partner attribution should call `@yo-protocol/core` directly (see the SDK skill) — the CLI doesn't expose a `--partner-id` flag yet.
 - **Cross-chain deposits are not in this CLI.** Use the YO HTTP API at `GET https://api.yo.xyz/api/v1/transactions/zapIn` when `fromChainId != toChainId`.
-- **Merkl claims are not in this CLI.** Encode `claim(...)` on the Merkl Distributor directly (see [yo-mcp/SKILL.md](../yo-mcp/SKILL.md)).
+- **Merkl claims are not in this CLI.** Encode `claim(...)` on the Merkl Distributor directly (see [yo-base-mcp-plugin/SKILL.md](../yo-base-mcp-plugin/SKILL.md)).
 - **Errors** are JSON to stderr with `{ ok: false, error: { code, message } }`. If `ok == false`, stop — never invent replacement parameters.
 
 ## Related
 
-- [`yo-mcp`](../yo-mcp/SKILL.md) — Base MCP plugin that wraps this CLI plus the YO HTTP API for chat-only surfaces.
+- [`yo-base-mcp-plugin`](../yo-base-mcp-plugin/SKILL.md) — Base MCP plugin that wraps this CLI plus the YO HTTP API for chat-only surfaces.
 - [`yo-protocol-sdk`](../yo-protocol-sdk/SKILL.md) — `@yo-protocol/core` TypeScript SDK. The CLI is a thin shim over this; chain support, ABIs, and slippage math live in `core`.
 - [`yo-protocol-react`](../yo-protocol-react/SKILL.md) — React hooks/components.
