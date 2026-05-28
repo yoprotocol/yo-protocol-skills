@@ -1,5 +1,5 @@
 ---
-name: yo-mcp
+name: yo-base-mcp-plugin
 description: >-
   Base MCP plugin for YO Protocol — ERC-4626 yield vaults with ERC-7540 async
   redemption on Ethereum (1), Base (8453), and Arbitrum (42161). Both deposit
@@ -10,7 +10,7 @@ description: >-
   "deposit into yo", "withdraw from yo", "yo vault", or "claim yo rewards".
 author: yoprotocol
 homepage: https://github.com/yoprotocol/yo-protocol-skills
-source: https://github.com/yoprotocol/yo-protocol-skills/tree/main/skills/yo-mcp
+source: https://github.com/yoprotocol/yo-protocol-skills/tree/main/skills/yo-base-mcp-plugin
 ---
 
 # YO Protocol Plugin
