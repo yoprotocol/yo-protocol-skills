@@ -44,10 +44,10 @@ USDC per call, no API keys, no signup.
 ## Base URL
 
 ```
-https://risk-graph-gx7v4.ondigitalocean.app
+https://risk.yo.xyz
 ```
 
-Every endpoint below resolves to `https://risk-graph-gx7v4.ondigitalocean.app/api/v1/agent/...`. The 402 challenge's `resource.url` field is the canonical source — agents reading the URL from the invoice keep working if the host ever moves.
+Every endpoint below resolves to `https://risk.yo.xyz/api/v1/agent/...`. The 402 challenge's `resource.url` field is the canonical source — agents reading the URL from the invoice keep working if the host ever moves.
 
 ## Installation
 
@@ -92,7 +92,7 @@ the `PAYMENT-REQUIRED` response header as base64-encoded JSON:
   "x402Version": 2,
   "error": "Payment required",
   "resource": {
-    "url": "https://risk-graph-gx7v4.ondigitalocean.app/api/v1/agent/pools",
+    "url": "https://risk.yo.xyz/api/v1/agent/pools",
     "description": "All risk-scored pools, sortable + filterable — primary agent payload",
     "mimeType": ""
   },
@@ -322,7 +322,7 @@ const client = new x402Client();
 client.register('eip155:*', new ExactEvmScheme(signer));  // wildcard covers any eip155 chain
 const fetchPaid = wrapFetchWithPayment(fetch, client);
 
-const res    = await fetchPaid('https://risk-graph-gx7v4.ondigitalocean.app/api/v1/agent/pools?limit=10');
+const res    = await fetchPaid('https://risk.yo.xyz/api/v1/agent/pools?limit=10');
 const json   = await res.json();                           // { data: { items, … }, … }
 const items  = json?.data?.items ?? [];
 const txHash = res.headers.get('payment-response');        // base64 settlement receipt
@@ -419,6 +419,6 @@ ______________________________________________________________________
    payload size; iterate via `hasMore`.
 
 1. **Sibling discovery surfaces.** The same content is also exposed at
-   `https://risk-graph-gx7v4.ondigitalocean.app/llms.txt` (overview + catalogue) and `/llms-full.txt`
+   `https://risk.yo.xyz/llms.txt` (overview + catalogue) and `/llms-full.txt`
    (full reference). Both are crawlable by AI assistants and listed in the
    site's sitemap — this skill is the in-IDE equivalent for Claude Code.
