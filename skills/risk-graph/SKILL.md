@@ -444,10 +444,12 @@ ______________________________________________________________________
 1. **Cache the schema response.** `/agent/schema` rarely changes; caching it for
    the agent session saves $0.001 on every subsequent call.
 
-1. **Sibling discovery surfaces.** The same content is also exposed at
-   `https://risk.yo.xyz/llms.txt` (overview + catalogue) and
-   `https://risk.yo.xyz/llms-full.txt` (full reference). Both are crawlable by AI
-   assistants and listed in the site's sitemap — this skill is the in-IDE
+1. **Sibling discovery surfaces.** `https://risk.yo.xyz` serves only the paid
+   `/api/v1/agent/*` API — it has no web pages. The same content in
+   human/crawler form lives on the website at
+   `https://yo.xyz/risk-graph/llms.txt` (overview + catalogue) and
+   `https://yo.xyz/risk-graph/llms-full.txt` (full reference). Both are crawlable
+   by AI assistants and listed in the site's sitemap — this skill is the in-IDE
    equivalent for Claude Code.
 
 ______________________________________________________________________
